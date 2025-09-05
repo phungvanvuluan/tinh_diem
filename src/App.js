@@ -4,24 +4,26 @@ function App() {
   // --- state chính ---
   const [players, setPlayers] = useState([]);
   const [newPlayer, setNewPlayer] = useState("");
-  const [scores, setScores] = useState({});     // tổng điểm
-  const [logs, setLogs] = useState([]);         // lịch sử các ván: [{A: +2, B: -2, ...}, ...]
+  const [scores, setScores] = useState({}); // tổng điểm
+  const [logs, setLogs] = useState([]); // lịch sử các ván: [{A: +2, B: -2, ...}, ...]
   const [currentRound, setCurrentRound] = useState({}); // điểm đang nhập của ván hiện tại
+  const [disabledButtons, setDisabledButtons] = useState({}); // Trạng thái disable của các nút theo người chơi
 
   // đổi tên / xóa
   const [editing, setEditing] = useState(null);
   const [editName, setEditName] = useState("");
 
   // form chặt heo
-  const [heoVictim, setHeoVictim] = useState("");  // người bị chặt
+  const [heoVictim, setHeoVictim] = useState(""); // người bị chặt
   const [heoChopper, setHeoChopper] = useState(""); // người chặt
-  const [heoColor, setHeoColor] = useState("den");  // 'den' | 'do'
+  const [heoColor, setHeoColor] = useState("den"); // 'den' | 'do'
 
   const pointMap = {
     nhat: 4,
     nhi: 2,
     ba: -2,
     chot: -4,
+    toiTrang: -4, // Tới trắng, 3 người còn lại mỗi người bị trừ 4 điểm
   };
 
   // --- helper ---
@@ -38,6 +40,7 @@ function App() {
     setPlayers((ps) => [...ps, name]);
     setScores((s) => ({ ...s, [name]: 0 }));
     setCurrentRound((cr) => ({ ...cr, [name]: 0 }));
+    setDisabledButtons((db) => ({ ...db, [name]: false }));
     setNewPlayer("");
   };
 
@@ -51,6 +54,7 @@ function App() {
         return rest3;
       })
     );
+    setDisabledButtons(({ [name]: _omit4, ...rest4 }) => rest4);
     // nếu đang dùng ở form chặt heo thì dọn
     if (heoVictim === name) setHeoVictim("");
     if (heoChopper === name) setHeoChopper("");
@@ -89,6 +93,11 @@ function App() {
         return { ...rest, [nn]: old ?? 0 };
       })
     );
+    // cập nhật disabled state
+    setDisabledButtons((db) => {
+      const { [oldName]: old, ...rest } = db;
+      return { ...rest, [nn]: old ?? false };
+    });
 
     // cập nhật nếu đang chọn trong form chặt heo
     if (heoVictim === oldName) setHeoVictim(nn);
@@ -99,8 +108,25 @@ function App() {
 
   // --- nhập điểm thường cho ván hiện tại ---
   const addScore = (player, type, custom = 0) => {
+    if (disabledButtons[player]) return;
+
     const delta = custom || pointMap[type] || 0;
-    setCurrentRound((cr) => ({ ...cr, [player]: (cr[player] || 0) + delta }));
+    const nextCurrentRound = { ...currentRound, [player]: delta };
+    const nextDisabledButtons = { ...disabledButtons, [player]: true };
+
+    if (type === 'toiTrang') {
+      players.forEach(p => {
+        if (p !== player) {
+          nextCurrentRound[p] = pointMap[type];
+          nextDisabledButtons[p] = true;
+        } else {
+          nextCurrentRound[p] = 12; // người tới trắng không cộng trừ điểm
+        }
+      });
+    }
+
+    setCurrentRound(nextCurrentRound);
+    setDisabledButtons(nextDisabledButtons);
   };
 
   // --- ghi sự kiện chặt heo (rõ ràng vai trò) ---
@@ -116,6 +142,17 @@ function App() {
     setHeoVictim("");
     setHeoChopper("");
     setHeoColor("den");
+  };
+
+  const resetRound = () => {
+    const reset = {};
+    const resetDisabled = {};
+    players.forEach(p => {
+      reset[p] = 0;
+      resetDisabled[p] = false;
+    });
+    setCurrentRound(reset);
+    setDisabledButtons(resetDisabled);
   };
 
   // --- hết ván: cộng vào tổng + lưu lịch sử ---
@@ -135,9 +172,7 @@ function App() {
     setLogs((L) => [...L, roundSnapshot]);
 
     // reset ván hiện tại
-    const reset = {};
-    players.forEach((p) => (reset[p] = 0));
-    setCurrentRound(reset);
+    resetRound();
   };
 
   const maxRounds = logs.length;
@@ -437,8 +472,8 @@ function App() {
                       background: index % 2 === 0 ? 'rgba(255,255,255,0.8)' : 'rgba(248,250,252,0.8)',
                       transition: 'all 0.3s ease'
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139,92,246,0.1)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = index % 2 === 0 ? 'rgba(255,255,255,0.8)' : 'rgba(248,250,252,0.8)'}
+                      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139,92,246,0.1)'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = index % 2 === 0 ? 'rgba(255,255,255,0.8)' : 'rgba(248,250,252,0.8)'}
                     >
                       {/* tên + sửa + xóa */}
                       <td style={{ padding: '12px 10px', fontWeight: '600' }}>
@@ -576,11 +611,13 @@ function App() {
                             { key: 'nhat', label: '🥇 Nhất', color: '#fbbf24' },
                             { key: 'nhi', label: '🥈 Nhì', color: '#a3a3a3' },
                             { key: 'ba', label: '🥉 Ba', color: '#cd7c2f' },
-                            { key: 'chot', label: '😢 Chót', color: '#ef4444' }
+                            { key: 'chot', label: '😢 Chót', color: '#ef4444' },
+                            ...(players.length === 4 ? [{ key: 'toiTrang', label: '✨ Tới Trắng', color: '#4c51bf' }] : [])
                           ].map(({ key, label, color }) => (
                             <button
                               key={key}
                               onClick={() => addScore(p, key)}
+                              disabled={disabledButtons[p]}
                               style={{
                                 background: color,
                                 color: 'white',
@@ -591,15 +628,21 @@ function App() {
                                 fontSize: '12px',
                                 fontWeight: 'bold',
                                 transition: 'all 0.2s ease',
-                                boxShadow: `0 2px 8px ${color}40`
+                                boxShadow: `0 2px 8px ${color}40`,
+                                opacity: disabledButtons[p] ? 0.6 : 1,
+                                pointerEvents: disabledButtons[p] ? 'none' : 'auto'
                               }}
                               onMouseEnter={(e) => {
-                                e.target.style.transform = 'translateY(-2px)';
-                                e.target.style.boxShadow = `0 4px 12px ${color}60`;
+                                if (!disabledButtons[p]) {
+                                  e.target.style.transform = 'translateY(-2px)';
+                                  e.target.style.boxShadow = `0 4px 12px ${color}60`;
+                                }
                               }}
                               onMouseLeave={(e) => {
-                                e.target.style.transform = 'translateY(0)';
-                                e.target.style.boxShadow = `0 2px 8px ${color}40`;
+                                if (!disabledButtons[p]) {
+                                  e.target.style.transform = 'translateY(0)';
+                                  e.target.style.boxShadow = `0 2px 8px ${color}40`;
+                                }
                               }}
                             >
                               {label}
@@ -608,18 +651,6 @@ function App() {
                           <input
                             type="number"
                             placeholder="+/-"
-                            style={{
-                              width: '60px',
-                              padding: '6px 8px',
-                              border: '2px solid #ddd',
-                              borderRadius: '8px',
-                              outline: 'none',
-                              textAlign: 'center',
-                              fontSize: '14px',
-                              transition: 'all 0.3s ease'
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = '#8b5cf6'}
-                            onBlur={(e) => e.target.style.borderColor = '#ddd'}
                             onKeyDown={(e) => {
                               if (e.key === "Enter") {
                                 const v = Number(e.currentTarget.value);
@@ -627,6 +658,21 @@ function App() {
                                 e.currentTarget.value = "";
                               }
                             }}
+                            disabled={disabledButtons[p]}
+                            style={{
+                              width: '60px',
+                              padding: '6px 8px',
+                              border: `2px solid ${disabledButtons[p] ? '#e5e7eb' : '#ddd'}`,
+                              borderRadius: '8px',
+                              outline: 'none',
+                              textAlign: 'center',
+                              fontSize: '14px',
+                              transition: 'all 0.3s ease',
+                              background: disabledButtons[p] ? '#f3f4f6' : 'white',
+                              pointerEvents: disabledButtons[p] ? 'none' : 'auto'
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = '#8b5cf6'}
+                            onBlur={(e) => e.target.style.borderColor = '#ddd'}
                           />
                         </div>
                       </td>
@@ -636,7 +682,35 @@ function App() {
               </table>
             </div>
 
-            <div style={{ textAlign: 'center' }}>
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <button
+                onClick={resetRound}
+                style={{
+                  padding: '12px 30px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(45deg, #ef4444, #f97316)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '25px',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 15px rgba(239,68,68,0.4)',
+                  transition: 'all 0.3s ease',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                  marginRight: '15px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-3px) scale(1.05)';
+                  e.target.style.boxShadow = '0 6px 20px rgba(239,68,68,0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0) scale(1)';
+                  e.target.style.boxShadow = '0 4px 15px rgba(239,68,68,0.4)';
+                }}
+              >
+                🔄 Reset Ván
+              </button>
               <button
                 onClick={endRound}
                 style={{
