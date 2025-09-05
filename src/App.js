@@ -26,7 +26,7 @@ function App() {
 
   // --- helper ---
   const colorize = (n) => ({
-    color: n > 0 ? "green" : n < 0 ? "red" : undefined,
+    color: n > 0 ? "#10b981" : n < 0 ? "#ef4444" : "#6b7280",
     fontWeight: 600,
   });
 
@@ -143,169 +143,584 @@ function App() {
   const maxRounds = logs.length;
 
   return (
-    <div style={{ textAlign: "center", padding: 20, background: "#eef2f6", minHeight: "100vh" }}>
-      <h1 style={{ marginTop: 10 }}>Tính Điểm Tiến Lên Miền Nam 🃏</h1>
+    <div style={{
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      minHeight: '100vh',
+      padding: '20px',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    }}>
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto'
+      }}>
+        <h1 style={{
+          textAlign: 'center',
+          color: 'white',
+          fontSize: '2.5rem',
+          fontWeight: 'bold',
+          textShadow: '0 4px 8px rgba(0,0,0,0.3)',
+          marginBottom: '30px',
+          animation: 'fadeInDown 0.8s ease-out'
+        }}>
+          🃏 Tính Điểm Tiến Lên Miền Nam 🃏
+        </h1>
 
-      {/* Thêm người chơi */}
-      <div style={{ margin: "10px 0 20px" }}>
-        <input
-          value={newPlayer}
-          onChange={(e) => setNewPlayer(e.target.value)}
-          placeholder="Nhập tên người chơi"
-          style={{ padding: 6, width: 220 }}
-        />
-        <button onClick={addPlayer} style={{ marginLeft: 8, padding: "6px 12px" }}>
-          Thêm
-        </button>
-      </div>
-
-      {/* Khối ghi sự kiện chặt heo (rõ vai trò) */}
-      {players.length >= 2 && (
-        <div
-          style={{
-            margin: "0 auto 16px",
-            background: "white",
-            border: "1px solid #ddd",
-            padding: 10,
-            width: 900,
-            borderRadius: 8,
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            justifyContent: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          <strong>Chặt heo:</strong>
-          <label>Người bị chặt</label>
-          <select value={heoVictim} onChange={(e) => setHeoVictim(e.target.value)}>
-            <option value="">-- chọn --</option>
-            {players.map((p) => (
-              <option key={p} value={p}>
-                {p}
-              </option>
-            ))}
-          </select>
-
-          <label>Người chặt</label>
-          <select value={heoChopper} onChange={(e) => setHeoChopper(e.target.value)}>
-            <option value="">-- chọn --</option>
-            {players.map((p) => (
-              <option key={p} value={p} disabled={p === heoVictim}>
-                {p}
-              </option>
-            ))}
-          </select>
-
-          <label>Loại heo</label>
-          <select value={heoColor} onChange={(e) => setHeoColor(e.target.value)}>
-            <option value="den">Đen (-/+2)</option>
-            <option value="do">Đỏ (-/+4)</option>
-          </select>
-
-          <button onClick={recordHeo} style={{ padding: "6px 12px" }}>
-            Ghi điểm
-          </button>
-        </div>
-      )}
-
-      {/* Bảng chính */}
-      {players.length > 0 && (
-        <>
-          <table
-            border="1"
-            cellPadding="8"
-            style={{
-              margin: "0 auto",
-              borderCollapse: "collapse",
-              minWidth: 900,
-              background: "white",
-            }}
-          >
-            <thead style={{ background: "#f3f4f6" }}>
-              <tr>
-                <th>Người chơi</th>
-                {Array.from({ length: maxRounds }, (_, i) => (
-                  <th key={i}>Ván {i + 1}</th>
-                ))}
-                <th>Điểm ván hiện tại</th>
-                <th>Tổng điểm</th>
-                <th>Hành động</th>
-              </tr>
-            </thead>
-            <tbody>
-              {players.map((p) => (
-                <tr key={p}>
-                  {/* tên + sửa + xóa */}
-                  <td>
-                    {editing === p ? (
-                      <>
-                        <input
-                          value={editName}
-                          onChange={(e) => setEditName(e.target.value)}
-                          style={{ width: 110 }}
-                        />
-                        <button onClick={() => saveEdit(p)}>💾</button>
-                        <button onClick={() => setEditing(null)}>❌</button>
-                      </>
-                    ) : (
-                      <>
-                        {p}{" "}
-                        <button onClick={() => startEdit(p)}>✏️</button>
-                        <button onClick={() => deletePlayer(p)}>🗑️</button>
-                      </>
-                    )}
-                  </td>
-
-                  {/* lịch sử ván đã chốt */}
-                  {Array.from({ length: maxRounds }, (_, i) => {
-                    const v = logs[i]?.[p] ?? 0;
-                    return (
-                      <td key={i} style={colorize(v)}>
-                        {v ? (v > 0 ? `+${v}` : v) : ""}
-                      </td>
-                    );
-                  })}
-
-                  {/* ván hiện tại */}
-                  <td style={colorize(currentRound[p] || 0)}>
-                    {currentRound[p] ? (currentRound[p] > 0 ? `+${currentRound[p]}` : currentRound[p]) : ""}
-                  </td>
-
-                  {/* tổng điểm */}
-                  <td style={colorize(scores[p] || 0)}>{scores[p] || 0}</td>
-
-                  {/* hành động thường */}
-                  <td>
-                    <button onClick={() => addScore(p, "nhat")}>Nhất</button>
-                    <button onClick={() => addScore(p, "nhi")}>Nhì</button>
-                    <button onClick={() => addScore(p, "ba")}>Ba</button>
-                    <button onClick={() => addScore(p, "chot")}>Chót</button>
-                    <input
-                      type="number"
-                      placeholder="+/-"
-                      style={{ width: 65, marginLeft: 6 }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          const v = Number(e.currentTarget.value);
-                          if (!Number.isNaN(v)) addScore(p, "custom", v);
-                          e.currentTarget.value = "";
-                        }
-                      }}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <div style={{ marginTop: 18 }}>
-            <button onClick={endRound} style={{ padding: "10px 20px" }}>
-              ✅ Hết ván
+        {/* Thêm người chơi */}
+        <div style={{
+          textAlign: 'center',
+          marginBottom: '30px'
+        }}>
+          <div style={{
+            background: 'rgba(255,255,255,0.15)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '15px',
+            padding: '20px',
+            display: 'inline-block',
+            border: '1px solid rgba(255,255,255,0.2)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+          }}>
+            <input
+              value={newPlayer}
+              onChange={(e) => setNewPlayer(e.target.value)}
+              placeholder="Nhập tên người chơi"
+              style={{
+                padding: '12px 16px',
+                fontSize: '16px',
+                border: 'none',
+                borderRadius: '25px',
+                outline: 'none',
+                width: '250px',
+                background: 'white',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                marginRight: '15px',
+                transition: 'all 0.3s ease'
+              }}
+              onFocus={(e) => e.target.style.transform = 'translateY(-2px)'}
+              onBlur={(e) => e.target.style.transform = 'translateY(0)'}
+            />
+            <button
+              onClick={addPlayer}
+              style={{
+                padding: '12px 24px',
+                fontSize: '16px',
+                background: 'linear-gradient(45deg, #ff6b6b, #ffa500)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                boxShadow: '0 4px 15px rgba(255,107,107,0.4)',
+                transition: 'all 0.3s ease',
+                textTransform: 'uppercase',
+                letterSpacing: '1px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-3px)';
+                e.target.style.boxShadow = '0 6px 20px rgba(255,107,107,0.6)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 15px rgba(255,107,107,0.4)';
+              }}
+            >
+              ➕ Thêm
             </button>
           </div>
-        </>
-      )}
+        </div>
+
+        {/* Khối ghi sự kiện chặt heo */}
+        {players.length >= 2 && (
+          <div style={{
+            background: 'rgba(255,255,255,0.95)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '20px',
+            padding: '25px',
+            marginBottom: '30px',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
+            border: '1px solid rgba(255,255,255,0.3)',
+            animation: 'slideInUp 0.6s ease-out'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              gap: '15px'
+            }}>
+              <span style={{
+                fontSize: '18px',
+                fontWeight: 'bold',
+                color: '#333',
+                background: 'linear-gradient(45deg, #ff6b6b, #ffa500)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                marginRight: '10px'
+              }}>
+                🐷 CHẶT HEO
+              </span>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <label style={{ fontWeight: '600', color: '#555' }}>Người bị chặt:</label>
+                <select
+                  value={heoVictim}
+                  onChange={(e) => setHeoVictim(e.target.value)}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '10px',
+                    border: '2px solid #ddd',
+                    background: 'white',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#ff6b6b'}
+                  onBlur={(e) => e.target.style.borderColor = '#ddd'}
+                >
+                  <option value="">-- chọn --</option>
+                  {players.map((p) => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <label style={{ fontWeight: '600', color: '#555' }}>Người chặt:</label>
+                <select
+                  value={heoChopper}
+                  onChange={(e) => setHeoChopper(e.target.value)}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '10px',
+                    border: '2px solid #ddd',
+                    background: 'white',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#10b981'}
+                  onBlur={(e) => e.target.style.borderColor = '#ddd'}
+                >
+                  <option value="">-- chọn --</option>
+                  {players.map((p) => (
+                    <option key={p} value={p} disabled={p === heoVictim}>{p}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <label style={{ fontWeight: '600', color: '#555' }}>Loại heo:</label>
+                <select
+                  value={heoColor}
+                  onChange={(e) => setHeoColor(e.target.value)}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '10px',
+                    border: '2px solid #ddd',
+                    background: 'white',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#8b5cf6'}
+                  onBlur={(e) => e.target.style.borderColor = '#ddd'}
+                >
+                  <option value="den">🖤 Đen (-/+2)</option>
+                  <option value="do">❤️ Đỏ (-/+4)</option>
+                </select>
+              </div>
+
+              <button
+                onClick={recordHeo}
+                style={{
+                  padding: '10px 20px',
+                  background: 'linear-gradient(45deg, #8b5cf6, #06b6d4)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  fontSize: '14px',
+                  boxShadow: '0 4px 15px rgba(139,92,246,0.4)',
+                  transition: 'all 0.3s ease',
+                  textTransform: 'uppercase'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 6px 20px rgba(139,92,246,0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 15px rgba(139,92,246,0.4)';
+                }}
+              >
+                ⚡ Ghi điểm
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Bảng chính */}
+        {players.length > 0 && (
+          <>
+            <div style={{
+              background: 'rgba(255,255,255,0.95)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '20px',
+              padding: '20px',
+              boxShadow: '0 15px 50px rgba(0,0,0,0.2)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              marginBottom: '30px',
+              animation: 'fadeInUp 0.8s ease-out',
+              overflowX: 'auto'
+            }}>
+              <table style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                fontSize: '14px'
+              }}>
+                <thead>
+                  <tr style={{
+                    background: 'linear-gradient(45deg, #667eea, #764ba2)',
+                    color: 'white'
+                  }}>
+                    <th style={{
+                      padding: '15px 10px',
+                      borderRadius: '10px 0 0 0',
+                      fontWeight: 'bold',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px'
+                    }}>
+                      👤 Người chơi
+                    </th>
+                    {Array.from({ length: maxRounds }, (_, i) => (
+                      <th key={i} style={{
+                        padding: '15px 10px',
+                        fontWeight: 'bold',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px'
+                      }}>
+                        Ván {i + 1}
+                      </th>
+                    ))}
+                    <th style={{
+                      padding: '15px 10px',
+                      fontWeight: 'bold',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      background: 'linear-gradient(45deg, #ffa500, #ff6b6b)'
+                    }}>
+                      🎯 Ván hiện tại
+                    </th>
+                    <th style={{
+                      padding: '15px 10px',
+                      fontWeight: 'bold',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      background: 'linear-gradient(45deg, #10b981, #06b6d4)'
+                    }}>
+                      🏆 Tổng điểm
+                    </th>
+                    <th style={{
+                      padding: '15px 10px',
+                      borderRadius: '0 10px 0 0',
+                      fontWeight: 'bold',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px'
+                    }}>
+                      ⚙️ Hành động
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {players.map((p, index) => (
+                    <tr key={p} style={{
+                      background: index % 2 === 0 ? 'rgba(255,255,255,0.8)' : 'rgba(248,250,252,0.8)',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139,92,246,0.1)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = index % 2 === 0 ? 'rgba(255,255,255,0.8)' : 'rgba(248,250,252,0.8)'}
+                    >
+                      {/* tên + sửa + xóa */}
+                      <td style={{ padding: '12px 10px', fontWeight: '600' }}>
+                        {editing === p ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                              value={editName}
+                              onChange={(e) => setEditName(e.target.value)}
+                              style={{
+                                width: '100px',
+                                padding: '4px 8px',
+                                border: '2px solid #ddd',
+                                borderRadius: '8px',
+                                outline: 'none'
+                              }}
+                            />
+                            <button
+                              onClick={() => saveEdit(p)}
+                              style={{
+                                background: '#10b981',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '4px 8px',
+                                cursor: 'pointer',
+                                fontSize: '12px'
+                              }}
+                            >
+                              💾
+                            </button>
+                            <button
+                              onClick={() => setEditing(null)}
+                              style={{
+                                background: '#ef4444',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '4px 8px',
+                                cursor: 'pointer',
+                                fontSize: '12px'
+                              }}
+                            >
+                              ❌
+                            </button>
+                          </div>
+                        ) : (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ color: '#333' }}>{p}</span>
+                            <button
+                              onClick={() => startEdit(p)}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                padding: '2px 4px',
+                                borderRadius: '4px',
+                                transition: 'all 0.2s ease'
+                              }}
+                              onMouseEnter={(e) => e.target.style.background = 'rgba(139,92,246,0.2)'}
+                              onMouseLeave={(e) => e.target.style.background = 'none'}
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              onClick={() => deletePlayer(p)}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                padding: '2px 4px',
+                                borderRadius: '4px',
+                                transition: 'all 0.2s ease'
+                              }}
+                              onMouseEnter={(e) => e.target.style.background = 'rgba(239,68,68,0.2)'}
+                              onMouseLeave={(e) => e.target.style.background = 'none'}
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        )}
+                      </td>
+
+                      {/* lịch sử ván đã chốt */}
+                      {Array.from({ length: maxRounds }, (_, i) => {
+                        const v = logs[i]?.[p] ?? 0;
+                        return (
+                          <td key={i} style={{
+                            padding: '12px 10px',
+                            textAlign: 'center',
+                            fontWeight: '600',
+                            fontSize: '16px',
+                            ...colorize(v)
+                          }}>
+                            {v ? (v > 0 ? `+${v}` : v) : ""}
+                          </td>
+                        );
+                      })}
+
+                      {/* ván hiện tại */}
+                      <td style={{
+                        padding: '12px 10px',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                        fontSize: '18px',
+                        background: 'rgba(255,165,0,0.1)',
+                        ...colorize(currentRound[p] || 0)
+                      }}>
+                        {currentRound[p] ? (currentRound[p] > 0 ? `+${currentRound[p]}` : currentRound[p]) : ""}
+                      </td>
+
+                      {/* tổng điểm */}
+                      <td style={{
+                        padding: '12px 10px',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                        fontSize: '20px',
+                        background: 'rgba(16,185,129,0.1)',
+                        ...colorize(scores[p] || 0)
+                      }}>
+                        {scores[p] || 0}
+                      </td>
+
+                      {/* hành động thường */}
+                      <td style={{ padding: '12px 10px' }}>
+                        <div style={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: '4px',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          {[
+                            { key: 'nhat', label: '🥇 Nhất', color: '#fbbf24' },
+                            { key: 'nhi', label: '🥈 Nhì', color: '#a3a3a3' },
+                            { key: 'ba', label: '🥉 Ba', color: '#cd7c2f' },
+                            { key: 'chot', label: '😢 Chót', color: '#ef4444' }
+                          ].map(({ key, label, color }) => (
+                            <button
+                              key={key}
+                              onClick={() => addScore(p, key)}
+                              style={{
+                                background: color,
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '8px',
+                                padding: '6px 10px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                transition: 'all 0.2s ease',
+                                boxShadow: `0 2px 8px ${color}40`
+                              }}
+                              onMouseEnter={(e) => {
+                                e.target.style.transform = 'translateY(-2px)';
+                                e.target.style.boxShadow = `0 4px 12px ${color}60`;
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.transform = 'translateY(0)';
+                                e.target.style.boxShadow = `0 2px 8px ${color}40`;
+                              }}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                          <input
+                            type="number"
+                            placeholder="+/-"
+                            style={{
+                              width: '60px',
+                              padding: '6px 8px',
+                              border: '2px solid #ddd',
+                              borderRadius: '8px',
+                              outline: 'none',
+                              textAlign: 'center',
+                              fontSize: '14px',
+                              transition: 'all 0.3s ease'
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = '#8b5cf6'}
+                            onBlur={(e) => e.target.style.borderColor = '#ddd'}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                const v = Number(e.currentTarget.value);
+                                if (!Number.isNaN(v)) addScore(p, "custom", v);
+                                e.currentTarget.value = "";
+                              }
+                            }}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div style={{ textAlign: 'center' }}>
+              <button
+                onClick={endRound}
+                style={{
+                  padding: '15px 40px',
+                  fontSize: '18px',
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(45deg, #10b981, #06b6d4)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '25px',
+                  cursor: 'pointer',
+                  boxShadow: '0 8px 25px rgba(16,185,129,0.4)',
+                  transition: 'all 0.3s ease',
+                  textTransform: 'uppercase',
+                  letterSpacing: '2px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-3px) scale(1.05)';
+                  e.target.style.boxShadow = '0 12px 35px rgba(16,185,129,0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0) scale(1)';
+                  e.target.style.boxShadow = '0 8px 25px rgba(16,185,129,0.4)';
+                }}
+              >
+                ✅ Hết Ván
+              </button>
+            </div>
+          </>
+        )}
+
+        <style>
+          {`
+            @keyframes fadeInDown {
+              from {
+                opacity: 0;
+                transform: translate3d(0, -100%, 0);
+              }
+              to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+              }
+            }
+
+            @keyframes slideInUp {
+              from {
+                opacity: 0;
+                transform: translate3d(0, 100%, 0);
+              }
+              to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+              }
+            }
+
+            @keyframes fadeInUp {
+              from {
+                opacity: 0;
+                transform: translate3d(0, 30px, 0);
+              }
+              to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+              }
+            }
+
+            * {
+              box-sizing: border-box;
+            }
+
+            button:active {
+              transform: scale(0.95) !important;
+            }
+
+            input:hover {
+              box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
+            }
+
+            select:hover {
+              box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+            }
+          `}
+        </style>
+      </div>
     </div>
   );
 }
