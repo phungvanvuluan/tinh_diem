@@ -792,6 +792,45 @@ function App() {
             select:hover {
               box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
             }
+            
+            /* Tối ưu cho di động */
+            @media (max-width: 768px) {
+              .mobile-flex-col {
+                flex-direction: column;
+                align-items: center;
+              }
+              h1 {
+                font-size: 1.8rem !important;
+              }
+              .add-player-form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+              }
+              .add-player-form input, .add-player-form button {
+                width: 100% !important;
+                margin: 0 !important;
+              }
+              .heo-form {
+                display: flex;
+                flex-direction: column;
+                gap: 15px !important;
+              }
+              .heo-form > div {
+                width: 100%;
+                justify-content: space-between;
+              }
+              table {
+                font-size: 12px;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+              }
+              td, th {
+                padding: 10px 8px !important;
+              }
+            }
           `}
         </style>
       </div>
