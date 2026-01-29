@@ -333,7 +333,6 @@ select:hover {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
-  overflow: visible;
 }
 
 .score-table thead tr {
@@ -1422,80 +1421,3 @@ select:hover {
     width: 100%;
   }
 }
-.player-menu-wrapper {
-  position: relative;
-}
-
-.menu-dot-btn {
-  background: transparent;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 4px 8px;
-  color: #6b7280;
-}
-
-.menu-dot-btn:hover {
-  color: #111827;
-}
-
-.player-menu {
-  position: absolute;
-  left: 100%;        /* đẩy sang phải */
-  top: 100%;         /* đẩy xuống dưới */
-  margin-left: 8px;  /* cách nút 1 chút */
-  margin-top: 4px;
-
-  background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
-  min-width: 140px;
-  z-index: 50;
-  overflow: hidden;
-  animation: fadeInMenu 0.15s ease-out;
-}
-
-.player-menu-item {
-  width: 100%;
-  padding: 8px 12px;
-  border: none;
-  background: white;
-  text-align: left;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.player-menu-item:hover {
-  background: #f3f4f6;
-}
-
-.player-menu-item.danger {
-  color: #dc2626;
-}
-
-.player-menu-item.danger:hover {
-  background: #fee2e2;
-}
-
-
-/* danh hiệu */
-.situation-title {
-  margin-top: 2px;
-  font-size: 11px;
-  opacity: 0.85;
-  font-style: italic;
-  color: #7c3aed;
-  animation: fadeInUp 0.4s ease;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 0.85;
-    transform: translateY(0);
-  }
-}
-

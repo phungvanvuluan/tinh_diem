@@ -52,71 +52,6 @@
   }
 }
 
-/* Streak Animations */
-@keyframes fireGlow {
-  0%, 100% {
-    text-shadow: 0 0 10px rgba(255, 149, 0, 0.8), 
-                 0 0 20px rgba(255, 100, 0, 0.6);
-  }
-  50% {
-    text-shadow: 0 0 20px rgba(255, 149, 0, 1), 
-                 0 0 30px rgba(255, 100, 0, 0.8),
-                 0 0 40px rgba(255, 50, 0, 0.6);
-  }
-}
-
-@keyframes fireGlowStrong {
-  0%, 100% {
-    text-shadow: 0 0 15px rgba(255, 69, 0, 0.9), 
-                 0 0 25px rgba(255, 30, 0, 0.7),
-                 0 0 35px rgba(200, 0, 0, 0.5);
-  }
-  50% {
-    text-shadow: 0 0 25px rgba(255, 69, 0, 1), 
-                 0 0 40px rgba(255, 30, 0, 0.9),
-                 0 0 55px rgba(200, 0, 0, 0.7);
-  }
-}
-
-@keyframes fireGlowGodlike {
-  0%, 100% {
-    text-shadow: 0 0 20px rgba(138, 43, 226, 1), 
-                 0 0 35px rgba(75, 0, 130, 0.8),
-                 0 0 50px rgba(138, 43, 226, 0.6);
-  }
-  50% {
-    text-shadow: 0 0 30px rgba(138, 43, 226, 1), 
-                 0 0 50px rgba(75, 0, 130, 1),
-                 0 0 70px rgba(138, 43, 226, 0.8);
-  }
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-2px) rotate(-1deg); }
-  75% { transform: translateX(2px) rotate(1deg); }
-}
-
-@keyframes coldFade {
-  0%, 100% {
-    opacity: 0.7;
-    text-shadow: 0 0 10px rgba(100, 200, 255, 0.5);
-  }
-  50% {
-    opacity: 0.9;
-    text-shadow: 0 0 15px rgba(100, 200, 255, 0.7);
-  }
-}
-
-@keyframes cursedShake {
-  0%, 100% { transform: translateY(0); }
-  10% { transform: translateY(-1px); }
-  20% { transform: translateY(1px); }
-  30% { transform: translateY(-1px); }
-  40% { transform: translateY(1px); }
-  50% { transform: translateY(0); }
-}
-
 /* Base styles */
 * {
   box-sizing: border-box;
@@ -333,7 +268,6 @@ select:hover {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
-  overflow: visible;
 }
 
 .score-table thead tr {
@@ -385,95 +319,6 @@ select:hover {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.player-name-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.player-name {
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-/* Win Streak Effects */
-.player-name.streak-hot {
-  color: #ff9500 !important;
-  animation: fireGlow 1.5s ease-in-out infinite;
-  font-weight: 700;
-}
-
-.player-name.streak-dominating {
-  color: #ff4500 !important;
-  animation: fireGlowStrong 1s ease-in-out infinite, shake 0.3s ease-in-out infinite;
-  font-weight: 800;
-}
-
-.player-name.streak-unstoppable {
-  color: #dc2626 !important;
-  animation: fireGlowStrong 0.8s ease-in-out infinite, shake 0.25s ease-in-out infinite;
-  font-weight: 900;
-  font-size: 110%;
-}
-
-.player-name.streak-godlike {
-  background: linear-gradient(45deg, #8b5cf6, #ec4899, #8b5cf6);
-  background-size: 200% 200%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: fireGlowGodlike 0.7s ease-in-out infinite, shake 0.2s ease-in-out infinite;
-  font-weight: 900;
-  font-size: 115%;
-}
-
-/* Lose Streak Effects */
-.player-name.streak-unlucky {
-  color: #60a5fa !important;
-  animation: coldFade 2s ease-in-out infinite;
-  font-weight: 500;
-  opacity: 0.8;
-}
-
-.player-name.streak-cold {
-  color: #3b82f6 !important;
-  animation: coldFade 1.5s ease-in-out infinite;
-  font-weight: 500;
-  opacity: 0.7;
-}
-
-.player-name.streak-cursed {
-  color: #6b7280 !important;
-  animation: cursedShake 3s ease-in-out infinite, coldFade 2s ease-in-out infinite;
-  font-weight: 500;
-  opacity: 0.6;
-  text-decoration: line-through;
-  text-decoration-color: rgba(107, 114, 128, 0.3);
-}
-
-.streak-badge {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1));
-  border-radius: 6px;
-  padding: 4px 8px;
-  border: 1px solid rgba(139, 92, 246, 0.3);
-}
-
-.streak-title {
-  font-size: 11px;
-  font-weight: bold;
-  color: #8b5cf6;
-  white-space: nowrap;
-}
-
-.streak-count {
-  font-size: 10px;
-  color: #666;
-  font-weight: 600;
 }
 
 .edit-input {
@@ -1206,30 +1051,6 @@ select:hover {
   
   .player-actions {
     justify-content: center;
-    flex-wrap: wrap;
-  }
-  
-  .player-name-wrapper {
-    width: 100%;
-    align-items: center;
-    text-align: center;
-  }
-  
-  .player-name.streak-godlike,
-  .player-name.streak-unstoppable {
-    font-size: 105% !important;
-  }
-  
-  .streak-badge {
-    margin-top: 4px;
-  }
-  
-  .streak-title {
-    font-size: 10px;
-  }
-  
-  .streak-count {
-    font-size: 9px;
   }
   
   .action-buttons {
@@ -1422,80 +1243,3 @@ select:hover {
     width: 100%;
   }
 }
-.player-menu-wrapper {
-  position: relative;
-}
-
-.menu-dot-btn {
-  background: transparent;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 4px 8px;
-  color: #6b7280;
-}
-
-.menu-dot-btn:hover {
-  color: #111827;
-}
-
-.player-menu {
-  position: absolute;
-  left: 100%;        /* đẩy sang phải */
-  top: 100%;         /* đẩy xuống dưới */
-  margin-left: 8px;  /* cách nút 1 chút */
-  margin-top: 4px;
-
-  background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
-  min-width: 140px;
-  z-index: 50;
-  overflow: hidden;
-  animation: fadeInMenu 0.15s ease-out;
-}
-
-.player-menu-item {
-  width: 100%;
-  padding: 8px 12px;
-  border: none;
-  background: white;
-  text-align: left;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.player-menu-item:hover {
-  background: #f3f4f6;
-}
-
-.player-menu-item.danger {
-  color: #dc2626;
-}
-
-.player-menu-item.danger:hover {
-  background: #fee2e2;
-}
-
-
-/* danh hiệu */
-.situation-title {
-  margin-top: 2px;
-  font-size: 11px;
-  opacity: 0.85;
-  font-style: italic;
-  color: #7c3aed;
-  animation: fadeInUp 0.4s ease;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 0.85;
-    transform: translateY(0);
-  }
-}
-
