@@ -133,7 +133,6 @@ function App() {
       ...ps,
       [name]: { current: 0, type: null, history: [] },
     }));
-    setPlayerAchievements((pa) => ({ ...pa, [name]: [] }));
     setNewPlayer("");
   };
 
@@ -149,7 +148,6 @@ function App() {
     );
     setDisabledButtons(({ [name]: _omit4, ...rest4 }) => rest4);
     setPlayerStreaks(({ [name]: _omit5, ...rest5 }) => rest5);
-    setPlayerAchievements(({ [name]: _omit6, ...rest6 }) => rest6);
     // xóa khỏi lịch sử heo
     setHeoLogs((logs) =>
       logs.filter((h) => h.victim !== name && h.chopper !== name),
