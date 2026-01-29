@@ -15,7 +15,6 @@ function App() {
 
   // Hệ thống streak và achievement
   const [playerStreaks, setPlayerStreaks] = useState({}); // {playerName: {current: 5, type: 'win'/'lose', history: [...]}}
-  const [playerAchievements, setPlayerAchievements] = useState({}); // {playerName: ['Hot Hand', 'Streak Master', ...]}
 
   // đổi tên / xóa
   const [editing, setEditing] = useState(null);
