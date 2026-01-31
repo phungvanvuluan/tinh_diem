@@ -467,10 +467,7 @@ function App() {
     return total;
   };
 
-  const maxRounds = logs.length;
   // Chỉ hiển thị 3 ván gần nhất trên bảng
-  const visibleRounds = Math.min(3, maxRounds);
-  const startRoundIndex = Math.max(0, maxRounds - 3);
 
   //danh hiệu
   const getSituationTitle = (player) => {
