@@ -365,6 +365,18 @@ function App() {
       return;
     }
 
+    // Kiểm tra tổng điểm của 4 người phải = 0
+    const totalScore = Object.values(currentRound).reduce(
+      (sum, score) => sum + score,
+      0,
+    );
+    if (totalScore !== 0) {
+      alert(
+        `⚠️ CẢNH BÁO: Tổng điểm không bằng 0!\n\nTổng hiện tại: ${totalScore > 0 ? "+" : ""}${totalScore}\n\nVui lòng kiểm tra lại điểm trước khi kết thúc ván.`,
+      );
+      return;
+    }
+
     // cộng vào tổng
     const nextScores = { ...scores };
     const roundSnapshot = {};
@@ -537,7 +549,7 @@ function App() {
   return (
     <div className="app-container" onClick={() => setOpenMenuPlayer(null)}>
       <div className="app-content">
-        <h1 className="app-title">🃏 Tính Điểm Tiến Lên Miền Nam 🃏</h1>
+        <h1 className="app-title">🃏 Tính Điểm Tiến Lên 🃏</h1>
 
         {/* Thêm người chơi */}
         {players.length < 4 && (
@@ -631,253 +643,269 @@ function App() {
           </div>
         )}
 
-        {/* Bảng chính */}
+        {/* Phần nhập điểm cho từng người chơi */}
         {players.length > 0 && (
           <>
-            <div className="table-container">
-              <table className="score-table">
-                <thead>
-                  <tr>
-                    <th>👤 Người chơi</th>
-                    {Array.from({ length: visibleRounds }, (_, i) => {
-                      const actualIndex = startRoundIndex + i;
-                      return <th key={actualIndex}>Ván {actualIndex + 1}</th>;
-                    })}
-                    <th
-                      style={{
-                        background: "linear-gradient(45deg, #ffa500, #ff6b6b)",
-                      }}
-                    >
-                      🎯 Ván hiện tại
-                    </th>
-                    <th
-                      style={{
-                        background: "linear-gradient(45deg, #10b981, #06b6d4)",
-                      }}
-                    >
-                      🏆 Tổng điểm
-                    </th>
-                    <th>⚙️ Hành động</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {players.map((p, index) => (
-                    <tr key={p}>
-                      {/* tên + sửa + xóa */}
-                      <td className="player-name-cell">
-                        {editing === p ? (
-                          <div className="player-actions">
-                            <input
-                              className="edit-input"
-                              value={editName}
-                              onChange={(e) => setEditName(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") saveEdit(p);
-                                if (e.key === "Escape") setEditing(null);
-                              }}
-                              autoFocus
-                            />
-                            <button
-                              className="save-btn"
-                              onClick={() => saveEdit(p)}
-                            >
-                              💾
-                            </button>
-                            <button
-                              className="cancel-btn"
-                              onClick={() => setEditing(null)}
-                            >
-                              ❌
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="player-actions">
-                            <div className="player-name-wrapper">
-                              <span
-                                className={`player-name ${getStreakClass(playerStreaks[p]?.current || 0, playerStreaks[p]?.type)}`}
-                                style={{ color: "#333" }}
-                              >
-                                {p}
-                              </span>
-                              {/* xử lí hiển thị danh hiệu */}
-                              {getSituationTitle(p) && (
-                                <div className="situation-title">
-                                  {getSituationTitle(p)}
-                                </div>
-                              )}
-
-                              {playerStreaks[p]?.current >= 3 && (
-                                <div className="streak-badge">
-                                  <span className="streak-title">
-                                    {getStreakTitle(
-                                      playerStreaks[p].current,
-                                      playerStreaks[p].type,
-                                    )}
-                                  </span>
-                                  <span className="streak-count">
-                                    {playerStreaks[p].current}{" "}
-                                    {playerStreaks[p].type === "win"
-                                      ? "thắng"
-                                      : "thua"}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
+            <div className="players-input-section">
+              {players.map((p) => (
+                <div key={p} className="player-card">
+                  {/* Header với tên và menu */}
+                  <div className="player-card-header">
+                    {editing === p ? (
+                      <div className="player-edit-mode">
+                        <input
+                          className="edit-input"
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") saveEdit(p);
+                            if (e.key === "Escape") setEditing(null);
+                          }}
+                          autoFocus
+                        />
+                        <button
+                          className="save-btn"
+                          onClick={() => saveEdit(p)}
+                        >
+                          💾
+                        </button>
+                        <button
+                          className="cancel-btn"
+                          onClick={() => setEditing(null)}
+                        >
+                          ❌
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="player-card-name">
+                          <span className="player-name-text">{p}</span>
+                        </div>
+                        <div
+                          className="player-menu-wrapper"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            className="menu-dot-btn"
+                            onClick={() =>
+                              setOpenMenuPlayer(
+                                openMenuPlayer === p ? null : p,
+                              )
+                            }
+                          >
+                            ⋮
+                          </button>
+                          {openMenuPlayer === p && (
                             <div
-                              className="player-menu-wrapper"
+                              className="player-menu"
                               onClick={(e) => e.stopPropagation()}
                             >
                               <button
-                                className="menu-dot-btn"
-                                onClick={() =>
-                                  setOpenMenuPlayer(
-                                    openMenuPlayer === p ? null : p,
-                                  )
-                                }
+                                className="player-menu-item"
+                                onClick={() => {
+                                  startEdit(p);
+                                  setOpenMenuPlayer(null);
+                                }}
                               >
-                                ⋮
+                                ✏️ Sửa tên
                               </button>
-
-                              {openMenuPlayer === p && (
-                                <div
-                                  className="player-menu"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <button
-                                    className="player-menu-item"
-                                    onClick={() => {
-                                      startEdit(p);
-                                      setOpenMenuPlayer(null);
-                                    }}
-                                  >
-                                    ✏️ Sửa tên
-                                  </button>
-
-                                  <button
-                                    className="player-menu-item danger"
-                                    onClick={() => {
-                                      deletePlayer(p);
-                                      setOpenMenuPlayer(null);
-                                    }}
-                                  >
-                                    🗑️ Xóa
-                                  </button>
-                                </div>
-                              )}
+                              <button
+                                className="player-menu-item danger"
+                                onClick={() => {
+                                  deletePlayer(p);
+                                  setOpenMenuPlayer(null);
+                                }}
+                              >
+                                🗑️ Xóa
+                              </button>
                             </div>
-                          </div>
-                        )}
-                      </td>
-
-                      {/* lịch sử ván đã chốt - chỉ hiển thị 3 ván gần nhất */}
-                      {Array.from({ length: visibleRounds }, (_, i) => {
-                        const actualIndex = startRoundIndex + i;
-                        const v = logs[actualIndex]?.[p] ?? 0;
-                        return (
-                          <td
-                            key={actualIndex}
-                            className="score-cell"
-                            style={colorize(v)}
-                          >
-                            {/* {v ? (v > 0 ? `+${v}` : v) : ""} */}
-                            {v > 0 ? `+${v}` : v}
-                          </td>
-                        );
-                      })}
-
-                      {/* ván hiện tại */}
-                      <td
-                        className="current-round-cell"
-                        style={colorize(currentRound[p] || 0)}
-                      >
-                        {currentRound[p] > 0
-                          ? `+${currentRound[p]}`
-                          : currentRound[p]}
-                      </td>
-
-                      {/* tổng điểm */}
-                      <td
-                        className="total-score-cell"
-                        style={colorize(scores[p] || 0)}
-                      >
-                        {scores[p] || 0}
-                      </td>
-
-                      {/* hành động thường */}
-                      <td>
-                        <div className="action-buttons">
-                          {[
-                            { key: "nhat", label: "🥇 Nhất", color: "#fbbf24" },
-                            { key: "nhi", label: "🥈 Nhì", color: "#a3a3a3" },
-                            { key: "ba", label: "🥉 Ba", color: "#cd7c2f" },
-                            { key: "chot", label: "😢 Chót", color: "#ef4444" },
-                            ...(players.length === 4
-                              ? [
-                                  {
-                                    key: "toiTrang",
-                                    label: "✨ Tới Trắng",
-                                    color: "#4c51bf",
-                                  },
-                                ]
-                              : []),
-                          ].map(({ key, label, color }) => (
-                            <button
-                              key={key}
-                              className="rank-btn"
-                              onClick={() => addScore(p, key)}
-                              disabled={disabledButtons[p]}
-                              style={{
-                                background: color,
-                                boxShadow: `0 2px 8px ${color}40`,
-                              }}
-                            >
-                              {label}
-                            </button>
-                          ))}
-
-                          {/* Nút Bóp Cổ */}
-                          {players.length === 4 && (
-                            <button
-                              className="rank-btn"
-                              onClick={() => openBopCo(p)}
-                              disabled={disabledButtons[p]}
-                              style={{
-                                background: "#dc2626",
-                                boxShadow: "0 2px 8px #dc262640",
-                              }}
-                            >
-                              💀 Bóp Cổ
-                            </button>
                           )}
-
-                          <input
-                            className="custom-score-input"
-                            type="number"
-                            placeholder="+/-"
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                const v = Number(e.currentTarget.value);
-                                if (!Number.isNaN(v) && v !== 0)
-                                  addScore(p, "custom", v);
-                                e.currentTarget.value = "";
-                              }
-                            }}
-                            disabled={disabledButtons[p]}
-                          />
                         </div>
-                      </td>
-                    </tr>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Điểm ván hiện tại */}
+                  <div className="player-card-score">
+                    <span
+                      className="score-value"
+                      style={colorize(currentRound[p] || 0)}
+                    >
+                      {currentRound[p] > 0
+                        ? `+${currentRound[p]}`
+                        : currentRound[p] || 0}
+                    </span>
+                  </div>
+
+                  {/* Nút hành động */}
+                  <div className="player-card-actions">
+                    {[
+                      { key: "nhat", label: "🥇", color: "#fbbf24" },
+                      { key: "nhi", label: "🥈", color: "#a3a3a3" },
+                      { key: "ba", label: "🥉", color: "#cd7c2f" },
+                      { key: "chot", label: "😢", color: "#ef4444" },
+                    ].map(({ key, label, color }) => (
+                      <button
+                        key={key}
+                        className="action-btn-compact"
+                        onClick={() => addScore(p, key)}
+                        disabled={disabledButtons[p]}
+                        style={{
+                          background: color,
+                          boxShadow: `0 2px 8px ${color}40`,
+                        }}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Nút đặc biệt */}
+                  {players.length === 4 && (
+                    <div className="player-card-special">
+                      <button
+                        className="special-btn"
+                        onClick={() => addScore(p, "toiTrang")}
+                        disabled={disabledButtons[p]}
+                      >
+                        ✨ Tới Trắng
+                      </button>
+                      <button
+                        className="special-btn bop-co"
+                        onClick={() => openBopCo(p)}
+                        disabled={disabledButtons[p]}
+                      >
+                        💀 Bóp Cổ
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Input tùy chỉnh */}
+                  <input
+                    className="custom-score-input-compact"
+                    type="number"
+                    placeholder="Điểm tùy chỉnh..."
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        const v = Number(e.currentTarget.value);
+                        if (!Number.isNaN(v) && v !== 0)
+                          addScore(p, "custom", v);
+                        e.currentTarget.value = "";
+                      }
+                    }}
+                    disabled={disabledButtons[p]}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Bảng xếp hạng - Hiển thị dạng cột */}
+            <div className="leaderboard-section">
+              <div className="leaderboard-header">
+                <h3 className="leaderboard-title">🏆 BẢNG XẾP HẠNG</h3>
+                {/* Hiển thị tổng điểm ván hiện tại */}
+                {Object.values(currentRound).some((score) => score !== 0) && (
+                  <div
+                    className={`current-round-total ${
+                      Object.values(currentRound).reduce(
+                        (sum, score) => sum + score,
+                        0,
+                      ) !== 0
+                        ? "total-error"
+                        : "total-ok"
+                    }`}
+                  >
+                    <span className="total-label">Tổng ván này:</span>
+                    <span className="total-value">
+                      {Object.values(currentRound).reduce(
+                        (sum, score) => sum + score,
+                        0,
+                      ) > 0
+                        ? "+"
+                        : ""}
+                      {Object.values(currentRound).reduce(
+                        (sum, score) => sum + score,
+                        0,
+                      )}
+                    </span>
+                    {Object.values(currentRound).reduce(
+                      (sum, score) => sum + score,
+                      0,
+                    ) !== 0 && <span className="warning-icon">⚠️</span>}
+                  </div>
+                )}
+              </div>
+              <div className="leaderboard-grid">
+                {players
+                  .map((p) => ({
+                    name: p,
+                    score: scores[p] || 0,
+                    currentScore: currentRound[p] || 0,
+                    streak: playerStreaks[p],
+                  }))
+                  .sort((a, b) => b.score - a.score)
+                  .map((player, index) => (
+                    <div
+                      key={player.name}
+                      className={`leaderboard-item rank-${index + 1}`}
+                    >
+                      <div className="rank-badge">
+                        {index === 0 && "🥇"}
+                        {index === 1 && "🥈"}
+                        {index === 2 && "🥉"}
+                        {index === 3 && "😢"}
+                      </div>
+                      <div
+                        className={`player-info ${getStreakClass(player.streak?.current || 0, player.streak?.type)}`}
+                      >
+                        <span className="player-name-leaderboard">
+                          {player.name}
+                        </span>
+                        {getSituationTitle(player.name) && (
+                          <span className="situation-badge">
+                            {getSituationTitle(player.name)}
+                          </span>
+                        )}
+                        {player.streak?.current >= 3 && (
+                          <span className="streak-info">
+                            {getStreakTitle(
+                              player.streak.current,
+                              player.streak.type,
+                            )}
+                          </span>
+                        )}
+                      </div>
+                      <div className="score-info">
+                        <span
+                          className="total-score"
+                          style={colorize(player.score)}
+                        >
+                          {player.score}
+                        </span>
+                        {player.currentScore !== 0 && (
+                          <span
+                            className="current-change"
+                            style={colorize(player.currentScore)}
+                          >
+                            ({player.currentScore > 0 ? "+" : ""}
+                            {player.currentScore})
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
+              </div>
             </div>
 
             <div className="controls">
               <button
                 className="control-btn reset-round-btn"
                 onClick={resetRound}
+                disabled={
+                  Object.values(currentRound).every((score) => score === 0)
+                }
               >
-                🔄 Reset Ván
+                🔄 Reset Điểm
               </button>
               <button className="control-btn end-round-btn" onClick={endRound}>
                 ✅ Hết Ván
@@ -888,7 +916,7 @@ function App() {
                     className="control-btn history-btn"
                     onClick={() => setShowHistory(!showHistory)}
                   >
-                    📜 Xem Lịch Sử
+                    📜 Lịch Sử
                   </button>
                   <button
                     className="control-btn undo-btn"
@@ -928,7 +956,6 @@ function App() {
               </div>
 
               <div>
-                {/* {logs.map((round, roundIndex) => { */}
                 {[...logs]
                   .map((round, index) => ({
                     round,
