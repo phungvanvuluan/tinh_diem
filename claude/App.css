@@ -507,7 +507,7 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
 }
 
-/* Leaderboard Section - NEW */
+/* Leaderboard Section - PODIUM STYLE */
 .leaderboard-section {
   background: rgba(255,255,255,0.95);
   backdrop-filter: blur(10px);
@@ -576,58 +576,256 @@ select:focus {
   animation: shake 1s ease-in-out infinite;
 }
 
-.leaderboard-grid {
+/* Podium Container */
+.podium-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
-.leaderboard-item {
+.podium-top3 {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  height: 200px;
+}
+
+.podium-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.podium-column:active {
+  transform: scale(0.98);
+}
+
+/* Rank 1 - Giữa, cao nhất */
+.podium-column.rank-1 {
+  height: 100%;
+  background: linear-gradient(180deg, #fef3c7 0%, #fde68a 100%);
+  border: 3px solid #fbbf24;
+  order: 2;
+}
+
+/* Rank 2 - Trái, cao thứ 2 */
+.podium-column.rank-2 {
+  height: 80%;
+  background: linear-gradient(180deg, #f3f4f6 0%, #e5e7eb 100%);
+  border: 3px solid #9ca3af;
+  order: 1;
+}
+
+/* Rank 3 - Phải, cao thứ 3 */
+.podium-column.rank-3 {
+  height: 65%;
+  background: linear-gradient(180deg, #fed7aa 0%, #fdba74 100%);
+  border: 3px solid #f97316;
+  order: 3;
+}
+
+/* Streak Effects cho cột */
+.podium-column.streak-hot {
+  background: linear-gradient(180deg, #ffedd5 0%, #fed7aa 100%) !important;
+  border-color: #ff9500 !important;
+  animation: fireGlow 1.5s ease-in-out infinite;
+}
+
+.podium-column.streak-dominating {
+  background: linear-gradient(180deg, #fee2e2 0%, #fecaca 100%) !important;
+  border-color: #ff4500 !important;
+  animation: fireGlowStrong 1s ease-in-out infinite, shake 0.3s ease-in-out infinite;
+}
+
+.podium-column.streak-unstoppable {
+  background: linear-gradient(180deg, #fee2e2 0%, #fca5a5 100%) !important;
+  border-color: #dc2626 !important;
+  animation: fireGlowStrong 0.8s ease-in-out infinite, shake 0.25s ease-in-out infinite;
+  border-width: 4px !important;
+}
+
+.podium-column.streak-godlike {
+  background: linear-gradient(180deg, #fae8ff 0%, #f5d0fe 100%) !important;
+  border-color: #8b5cf6 !important;
+  animation: fireGlowGodlike 0.7s ease-in-out infinite, shake 0.2s ease-in-out infinite;
+  border-width: 4px !important;
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4) !important;
+}
+
+.podium-column.streak-unlucky {
+  background: linear-gradient(180deg, #dbeafe 0%, #bfdbfe 100%) !important;
+  border-color: #60a5fa !important;
+  animation: coldFade 2s ease-in-out infinite;
+  opacity: 0.9;
+}
+
+.podium-column.streak-cold {
+  background: linear-gradient(180deg, #dbeafe 0%, #93c5fd 100%) !important;
+  border-color: #3b82f6 !important;
+  animation: coldFade 1.5s ease-in-out infinite;
+  opacity: 0.85;
+}
+
+.podium-column.streak-cursed {
+  background: linear-gradient(180deg, #f3f4f6 0%, #d1d5db 100%) !important;
+  border-color: #6b7280 !important;
+  animation: cursedShake 3s ease-in-out infinite, coldFade 2s ease-in-out infinite;
+  opacity: 0.7;
+}
+
+.podium-player-info {
+  padding: 10px 8px 8px 8px;
+  text-align: center;
+  width: 100%;
+  background: rgba(255,255,255,0.5);
+  backdrop-filter: blur(5px);
+}
+
+.podium-rank-badge {
+  font-size: 28px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.podium-player-name {
+  font-weight: 800;
+  font-size: 13px;
+  color: #333;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.podium-situation {
+  font-size: 9px;
+  color: #7c3aed;
+  font-style: italic;
+  opacity: 0.9;
+  margin-top: 2px;
+}
+
+.podium-streak {
+  font-size: 8px;
+  color: #8b5cf6;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.podium-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 8px;
+}
+
+.podium-score-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.podium-total {
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.podium-change {
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+/* 4th Place - Separate */
+.podium-last {
+  width: 100%;
+}
+
+.podium-last-item {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border: 2px solid #ef4444;
+  border-radius: 12px;
+  padding: 10px 12px;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   transition: all 0.3s ease;
 }
 
-.leaderboard-item.rank-1 {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border: 2px solid #fbbf24;
+.podium-last-item:active {
+  transform: scale(0.98);
 }
 
-.leaderboard-item.rank-2 {
-  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-  border: 2px solid #9ca3af;
+/* Streak Effects cho last place */
+.podium-last-item.streak-hot {
+  background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%) !important;
+  border-color: #ff9500 !important;
+  animation: fireGlow 1.5s ease-in-out infinite;
 }
 
-.leaderboard-item.rank-3 {
-  background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
-  border: 2px solid #f97316;
+.podium-last-item.streak-dominating {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%) !important;
+  border-color: #ff4500 !important;
+  animation: fireGlowStrong 1s ease-in-out infinite, shake 0.3s ease-in-out infinite;
 }
 
-.leaderboard-item.rank-4 {
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-  border: 2px solid #ef4444;
+.podium-last-item.streak-unstoppable {
+  background: linear-gradient(135deg, #fee2e2 0%, #fca5a5 100%) !important;
+  border-color: #dc2626 !important;
+  animation: fireGlowStrong 0.8s ease-in-out infinite, shake 0.25s ease-in-out infinite;
+  border-width: 3px !important;
 }
 
-.rank-badge {
-  font-size: 24px;
+.podium-last-item.streak-godlike {
+  background: linear-gradient(135deg, #fae8ff 0%, #f5d0fe 100%) !important;
+  border-color: #8b5cf6 !important;
+  animation: fireGlowGodlike 0.7s ease-in-out infinite, shake 0.2s ease-in-out infinite;
+  border-width: 3px !important;
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4) !important;
+}
+
+.podium-last-item.streak-unlucky {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+  border-color: #60a5fa !important;
+  animation: coldFade 2s ease-in-out infinite;
+}
+
+.podium-last-item.streak-cold {
+  background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%) !important;
+  border-color: #3b82f6 !important;
+  animation: coldFade 1.5s ease-in-out infinite;
+}
+
+.podium-last-item.streak-cursed {
+  background: linear-gradient(135deg, #f3f4f6 0%, #d1d5db 100%) !important;
+  border-color: #6b7280 !important;
+  animation: cursedShake 3s ease-in-out infinite, coldFade 2s ease-in-out infinite;
+}
+
+.podium-last-badge {
+  font-size: 32px;
   line-height: 1;
   flex-shrink: 0;
 }
 
-.player-info {
+.podium-last-info {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   min-width: 0;
 }
 
-.player-name-leaderboard {
+.podium-last-name {
   font-weight: 700;
   font-size: 15px;
   color: #333;
@@ -636,72 +834,20 @@ select:focus {
   text-overflow: ellipsis;
 }
 
-/* Streak effects in leaderboard */
-.player-info.streak-hot .player-name-leaderboard {
-  color: #ff9500;
-  animation: fireGlow 1.5s ease-in-out infinite;
-}
-
-.player-info.streak-dominating .player-name-leaderboard {
-  color: #ff4500;
-  animation: fireGlowStrong 1s ease-in-out infinite, shake 0.3s ease-in-out infinite;
-}
-
-.player-info.streak-unstoppable .player-name-leaderboard {
-  color: #dc2626;
-  animation: fireGlowStrong 0.8s ease-in-out infinite, shake 0.25s ease-in-out infinite;
-  font-size: 16px;
-}
-
-.player-info.streak-godlike .player-name-leaderboard {
-  background: linear-gradient(45deg, #8b5cf6, #ec4899, #8b5cf6);
-  background-size: 200% 200%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: fireGlowGodlike 0.7s ease-in-out infinite, shake 0.2s ease-in-out infinite;
-  font-size: 17px;
-}
-
-.player-info.streak-unlucky .player-name-leaderboard {
-  color: #60a5fa;
-  animation: coldFade 2s ease-in-out infinite;
-  opacity: 0.9;
-}
-
-.player-info.streak-cold .player-name-leaderboard {
-  color: #3b82f6;
-  animation: coldFade 1.5s ease-in-out infinite;
-  opacity: 0.85;
-}
-
-.player-info.streak-cursed .player-name-leaderboard {
-  color: #6b7280;
-  animation: cursedShake 3s ease-in-out infinite, coldFade 2s ease-in-out infinite;
-  opacity: 0.7;
-  text-decoration: line-through;
-}
-
-.situation-badge {
+.podium-last-situation {
   font-size: 10px;
   color: #7c3aed;
   font-style: italic;
   opacity: 0.9;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.streak-info {
+.podium-last-streak {
   font-size: 9px;
   color: #8b5cf6;
   font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.score-info {
+.podium-last-score {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -709,12 +855,12 @@ select:focus {
   flex-shrink: 0;
 }
 
-.total-score {
+.podium-last-total {
   font-size: 20px;
   font-weight: 800;
 }
 
-.current-change {
+.podium-last-change {
   font-size: 12px;
   font-weight: 600;
   opacity: 0.8;

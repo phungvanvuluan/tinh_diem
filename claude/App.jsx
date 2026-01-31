@@ -799,7 +799,7 @@ function App() {
               ))}
             </div>
 
-            {/* Bảng xếp hạng - Hiển thị dạng cột */}
+            {/* Bảng xếp hạng - Podium Style */}
             <div className="leaderboard-section">
               <div className="leaderboard-header">
                 <h3 className="leaderboard-title">🏆 BẢNG XẾP HẠNG</h3>
@@ -835,65 +835,141 @@ function App() {
                   </div>
                 )}
               </div>
-              <div className="leaderboard-grid">
-                {players
-                  .map((p) => ({
-                    name: p,
-                    score: scores[p] || 0,
-                    currentScore: currentRound[p] || 0,
-                    streak: playerStreaks[p],
-                  }))
-                  .sort((a, b) => b.score - a.score)
-                  .map((player, index) => (
-                    <div
-                      key={player.name}
-                      className={`leaderboard-item rank-${index + 1}`}
-                    >
-                      <div className="rank-badge">
-                        {index === 0 && "🥇"}
-                        {index === 1 && "🥈"}
-                        {index === 2 && "🥉"}
-                        {index === 3 && "😢"}
+
+              <div className="podium-container">
+                {(() => {
+                  const sortedPlayers = players
+                    .map((p) => ({
+                      name: p,
+                      score: scores[p] || 0,
+                      currentScore: currentRound[p] || 0,
+                      streak: playerStreaks[p],
+                    }))
+                    .sort((a, b) => b.score - a.score);
+
+                  // Sắp xếp lại: [2nd, 1st, 3rd, 4th]
+                  const podiumOrder = [
+                    sortedPlayers[1], // 2nd - bên trái
+                    sortedPlayers[0], // 1st - giữa
+                    sortedPlayers[2], // 3rd - bên phải
+                    sortedPlayers[3], // 4th - dưới cùng (nếu có)
+                  ].filter(Boolean);
+
+                  return (
+                    <>
+                      {/* Top 3 Podium */}
+                      <div className="podium-top3">
+                        {podiumOrder.slice(0, 3).map((player, idx) => {
+                          // Map index to actual rank
+                          const actualRank = idx === 0 ? 2 : idx === 1 ? 1 : 3;
+                          const streakClass = getStreakClass(
+                            player.streak?.current || 0,
+                            player.streak?.type,
+                          );
+
+                          return (
+                            <div
+                              key={player.name}
+                              className={`podium-column rank-${actualRank} ${streakClass}`}
+                            >
+                              <div className="podium-player-info">
+                                <div className="podium-rank-badge">
+                                  {actualRank === 1 && "🥇"}
+                                  {actualRank === 2 && "🥈"}
+                                  {actualRank === 3 && "🥉"}
+                                </div>
+                                <div className="podium-player-name">
+                                  {player.name}
+                                </div>
+                                {getSituationTitle(player.name) && (
+                                  <div className="podium-situation">
+                                    {getSituationTitle(player.name)}
+                                  </div>
+                                )}
+                                {player.streak?.current >= 3 && (
+                                  <div className="podium-streak">
+                                    {getStreakTitle(
+                                      player.streak.current,
+                                      player.streak.type,
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                              <div className="podium-bar">
+                                <div className="podium-score-display">
+                                  <span
+                                    className="podium-total"
+                                    style={colorize(player.score)}
+                                  >
+                                    {player.score}
+                                  </span>
+                                  {player.currentScore !== 0 && (
+                                    <span
+                                      className="podium-change"
+                                      style={colorize(player.currentScore)}
+                                    >
+                                      ({player.currentScore > 0 ? "+" : ""}
+                                      {player.currentScore})
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                      <div
-                        className={`player-info ${getStreakClass(player.streak?.current || 0, player.streak?.type)}`}
-                      >
-                        <span className="player-name-leaderboard">
-                          {player.name}
-                        </span>
-                        {getSituationTitle(player.name) && (
-                          <span className="situation-badge">
-                            {getSituationTitle(player.name)}
-                          </span>
-                        )}
-                        {player.streak?.current >= 3 && (
-                          <span className="streak-info">
-                            {getStreakTitle(
-                              player.streak.current,
-                              player.streak.type,
-                            )}
-                          </span>
-                        )}
-                      </div>
-                      <div className="score-info">
-                        <span
-                          className="total-score"
-                          style={colorize(player.score)}
-                        >
-                          {player.score}
-                        </span>
-                        {player.currentScore !== 0 && (
-                          <span
-                            className="current-change"
-                            style={colorize(player.currentScore)}
+
+                      {/* 4th place - separate below */}
+                      {podiumOrder[3] && (
+                        <div className="podium-last">
+                          <div
+                            className={`podium-last-item ${getStreakClass(
+                              podiumOrder[3].streak?.current || 0,
+                              podiumOrder[3].streak?.type,
+                            )}`}
                           >
-                            ({player.currentScore > 0 ? "+" : ""}
-                            {player.currentScore})
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                            <div className="podium-last-badge">😢</div>
+                            <div className="podium-last-info">
+                              <div className="podium-last-name">
+                                {podiumOrder[3].name}
+                              </div>
+                              {getSituationTitle(podiumOrder[3].name) && (
+                                <div className="podium-last-situation">
+                                  {getSituationTitle(podiumOrder[3].name)}
+                                </div>
+                              )}
+                              {podiumOrder[3].streak?.current >= 3 && (
+                                <div className="podium-last-streak">
+                                  {getStreakTitle(
+                                    podiumOrder[3].streak.current,
+                                    podiumOrder[3].streak.type,
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            <div className="podium-last-score">
+                              <span
+                                className="podium-last-total"
+                                style={colorize(podiumOrder[3].score)}
+                              >
+                                {podiumOrder[3].score}
+                              </span>
+                              {podiumOrder[3].currentScore !== 0 && (
+                                <span
+                                  className="podium-last-change"
+                                  style={colorize(podiumOrder[3].currentScore)}
+                                >
+                                  ({podiumOrder[3].currentScore > 0 ? "+" : ""}
+                                  {podiumOrder[3].currentScore})
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </div>
 
