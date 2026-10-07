@@ -498,12 +498,13 @@ select:focus {
 
 .custom-score-input-compact {
   width: 100%;
+  min-height: 48px;
   padding: 10px;
   border: 2px solid #ddd;
   border-radius: 10px;
   outline: none;
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
   transition: all 0.3s ease;
   background: white;
 }
@@ -1017,10 +1018,20 @@ select:focus {
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-bottom: 15px;
+  position: sticky;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  z-index: 20;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 28px rgba(31, 41, 55, 0.22);
+  backdrop-filter: blur(12px);
 }
 
 .control-btn {
-  padding: 14px 16px;
+  min-height: 48px;
+  padding: 12px 10px;
   font-size: 13px;
   font-weight: bold;
   color: white;
@@ -1043,7 +1054,8 @@ select:focus {
 
 .end-round-btn {
   grid-column: span 2;
-  padding: 16px 20px;
+  min-height: 54px;
+  padding: 14px 20px;
   font-size: 16px;
   background: linear-gradient(45deg, #10b981, #06b6d4);
   letter-spacing: 1.5px;
@@ -1427,7 +1439,7 @@ select:focus {
 /* Tablets and larger - DESKTOP ENHANCEMENTS */
 @media (min-width: 768px) {
   .app-container {
-    padding: 20px;
+    padding: 20px 20px calc(24px + env(safe-area-inset-bottom));
   }
 
   .app-content {
@@ -1584,6 +1596,13 @@ select:focus {
     flex-wrap: wrap;
     gap: 15px;
     justify-content: center;
+    position: static;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
   }
 
   .control-btn {
