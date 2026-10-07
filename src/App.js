@@ -9,6 +9,7 @@ function App() {
   const [logs, setLogs] = useState([]); // lịch sử các ván
   const [heoLogs, setHeoLogs] = useState([]); // lịch sử chặt heo
   const [currentRound, setCurrentRound] = useState({}); // điểm đang nhập của ván hiện tại
+  const [customScoreDrafts, setCustomScoreDrafts] = useState({});
   const [currentRoundHeos, setCurrentRoundHeos] = useState([]); // heo của ván hiện tại
   const [disabledButtons, setDisabledButtons] = useState({}); // Trạng thái disable của các nút
   const [openMenuPlayer, setOpenMenuPlayer] = useState(null); // menu người chơi
@@ -224,6 +225,15 @@ function App() {
     setDisabledButtons(nextDisabledButtons);
   };
 
+  // Điểm tùy chỉnh là điểm cuối cùng của người chơi trong ván, để có thể sửa nhanh.
+  const commitCustomScore = (player, value) => {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return;
+    setCurrentRound((round) => ({ ...round, [player]: parsed }));
+    setDisabledButtons((buttons) => ({ ...buttons, [player]: true }));
+    setCustomScoreDrafts((drafts) => ({ ...drafts, [player]: "" }));
+  };
+
   // --- ghi sự kiện chặt heo ---
   const recordHeo = () => {
     if (!heoVictim || !heoChopper || heoVictim === heoChopper) return;
@@ -316,6 +326,7 @@ function App() {
       resetDisabled[p] = false;
     });
     setCurrentRound(reset);
+    setCustomScoreDrafts({});
     setDisabledButtons(resetDisabled);
     setCurrentRoundHeos([]);
   };
@@ -668,12 +679,15 @@ function App() {
                         className="action-btn-compact"
                         onClick={() => addScore(p, key)}
                         disabled={disabledButtons[p]}
+                        title={`${label} ${pointMap[key] > 0 ? "+" : ""}${pointMap[key]} điểm`}
+                        aria-label={`${p}: ${label}, ${pointMap[key] > 0 ? "cộng " : ""}${pointMap[key]} điểm`}
                         style={{
                           background: color,
                           boxShadow: `0 2px 8px ${color}40`,
                         }}
                       >
-                        {label}
+                        <span>{label}</span>
+                        <small>{pointMap[key] > 0 ? "+" : ""}{pointMap[key]}</small>
                       </button>
                     ))}
                   </div>
@@ -700,16 +714,29 @@ function App() {
                   <input
                     className="custom-score-input-compact"
                     type="number"
-                    placeholder="Điểm tùy chỉnh..."
+                    value={customScoreDrafts[p] ?? ""}
+                    placeholder={`Điểm: ${currentRound[p] || 0} · nhập để sửa`}
+                    aria-label={`Nhập điểm cho ${p}`}
+                    onChange={(e) =>
+                      setCustomScoreDrafts((drafts) => ({
+                        ...drafts,
+                        [p]: e.target.value,
+                      }))
+                    }
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
-                        const v = Number(e.currentTarget.value);
-                        if (!Number.isNaN(v) && v !== 0)
-                          addScore(p, "custom", v);
-                        e.currentTarget.value = "";
+                        e.preventDefault();
+                        if (e.currentTarget.value.trim() !== "") {
+                          commitCustomScore(p, e.currentTarget.value);
+                          e.currentTarget.blur();
+                        }
                       }
                     }}
-                    disabled={disabledButtons[p]}
+                    onBlur={(e) => {
+                      if (e.currentTarget.value.trim() !== "") {
+                        commitCustomScore(p, e.currentTarget.value);
+                      }
+                    }}
                   />
                 </div>
               ))}
